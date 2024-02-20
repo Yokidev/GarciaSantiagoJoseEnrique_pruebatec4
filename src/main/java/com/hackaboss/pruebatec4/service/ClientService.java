@@ -32,4 +32,5 @@ public class ClientService implements IClientService{
     public Client findClient(Long id) {
         return clientRepository.findById(id).orElse(null);
     }
+
 }

@@ -1,5 +1,7 @@
 package com.hackaboss.pruebatec4.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,13 +24,17 @@ public class RoomBooking {
 
     private String clientName;
 
+    @JsonBackReference(value = "room-roombooking")
     @ManyToOne
     @JoinColumn(name = "room_id")
     private Room room;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
     private LocalDate checkIn;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
     private LocalDate checkOut;
 
+    @JsonBackReference(value = "client-roombooking")
     @ManyToMany
     @JoinTable(name = "room_booking_client",
         joinColumns = @JoinColumn(name = "room_booking_id"),
