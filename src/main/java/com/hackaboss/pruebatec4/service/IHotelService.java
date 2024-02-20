@@ -3,6 +3,7 @@ package com.hackaboss.pruebatec4.service;
 import com.hackaboss.pruebatec4.dto.HotelDTO;
 import com.hackaboss.pruebatec4.model.Hotel;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface IHotelService {
@@ -12,4 +13,5 @@ public interface IHotelService {
     public void deleteHotel(Long id);
     public Hotel findHotel(Long id);
     public void editHotel(HotelDTO hotelDTO, Long id);
+    public List<HotelDTO> findHotelsByCityAndDateBetween(String city, LocalDate dateFrom, LocalDate dateTo);
 }

@@ -4,8 +4,10 @@ import com.hackaboss.pruebatec4.dto.HotelDTO;
 import com.hackaboss.pruebatec4.model.Hotel;
 import com.hackaboss.pruebatec4.service.IHotelService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -31,6 +33,14 @@ public class HotelController {
     /*Hoteles filtrados
     public Hotel getHotelByDateAndDestination()
     * */
+    @GetMapping("/hotelsFiltered")
+    public List<HotelDTO> getHotelsByCityAndDateBetween(
+            @RequestParam String city,
+            @RequestParam @DateTimeFormat(pattern = "yyyy/MM/dd") LocalDate dateFrom,
+            @RequestParam @DateTimeFormat(pattern = "yyyy/MM/dd") LocalDate dateTo
+    ){
+        return hotelService.findHotelsByCityAndDateBetween(city, dateFrom, dateTo);
+    }
 
 
     @PostMapping("/hotels/new")

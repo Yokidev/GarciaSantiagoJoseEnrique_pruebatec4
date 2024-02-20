@@ -2,6 +2,7 @@ package com.hackaboss.pruebatec4.service;
 
 import com.hackaboss.pruebatec4.dto.HotelDTO;
 import com.hackaboss.pruebatec4.dto.RoomDTO;
+import com.hackaboss.pruebatec4.exceptions.RoomBookingDataException;
 import com.hackaboss.pruebatec4.model.Hotel;
 import com.hackaboss.pruebatec4.model.Room;
 import com.hackaboss.pruebatec4.repository.HotelRepository;
@@ -10,6 +11,8 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -97,4 +100,54 @@ public class HotelService implements IHotelService{
         }
 
     }
+
+    @Override
+    public List<HotelDTO> findHotelsByCityAndDateBetween(String city, LocalDate dateFrom, LocalDate dateTo) {
+
+        List<Hotel> listHotel = hotelRepository.findByCity(city);
+
+        List<HotelDTO> listHotelDTO = new ArrayList<>();
+
+        if (listHotel.isEmpty())
+            throw new EntityNotFoundException("No hay hoteles que coincidan con la busqueda");
+
+        for (Hotel hotel:listHotel){
+
+            HotelDTO hotelDTO = new HotelDTO();
+
+            hotelDTO.setName(hotel.getName());
+            hotelDTO.setCity(hotel.getCity());
+            hotelDTO.setRooms(new ArrayList<>());
+
+            for (Room room: hotel.getRooms()) {
+                if (room.getRoomBookings().stream().anyMatch(roomBooked -> (dateFrom.isBefore(roomBooked.getCheckOut()) && dateTo.isAfter(roomBooked.getCheckIn()))) || !room.getAvailable())
+                    continue;
+
+                RoomDTO roomDTO = new RoomDTO();
+
+                roomDTO.setIdHotel(hotel.getId());
+                roomDTO.setRoomType(room.getRoomType());
+                roomDTO.setMaxCapacity(room.getMaxCapacity());
+                roomDTO.setPrice(room.getPrice());
+
+
+                hotelDTO.getRooms().add(roomDTO);
+            }
+
+            listHotelDTO.add(hotelDTO);
+        }
+
+        return listHotelDTO;
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
