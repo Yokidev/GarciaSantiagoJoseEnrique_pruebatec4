@@ -23,6 +23,5 @@ public class FlightBookingDTO implements Serializable {
     private String origin;
     private String destination;
     private String typeSeat;
-    private Integer numberTickets;
     private List<ClientDTO> passengers;
 }

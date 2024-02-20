@@ -1,6 +1,7 @@
 package com.hackaboss.pruebatec4.service;
 
 import com.hackaboss.pruebatec4.dto.HotelDTO;
+import com.hackaboss.pruebatec4.dto.RoomDTO;
 import com.hackaboss.pruebatec4.model.Hotel;
 import com.hackaboss.pruebatec4.model.Room;
 import com.hackaboss.pruebatec4.repository.HotelRepository;
@@ -21,6 +22,9 @@ public class HotelService implements IHotelService{
     @Autowired
     private RoomRepository roomRepository;
 
+    @Autowired
+    private RoomService roomService;
+
     @Override
     public List<Hotel> getHotels() {
         return hotelRepository.findAll();
@@ -36,9 +40,10 @@ public class HotelService implements IHotelService{
 
         hotelRepository.save(newHotel);
 
-        for (Room room : hotelDto.getRooms()) {
-            room.setHotel(newHotel);
-            roomRepository.save(room);
+        for (RoomDTO roomDto : hotelDto.getRooms()) {
+            roomDto.setIdHotel(newHotel.getId());
+
+            roomService.saveRoom(roomDto);
         }
 
     }

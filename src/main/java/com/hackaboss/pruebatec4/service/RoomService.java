@@ -91,10 +91,17 @@ public class RoomService implements IRoomService{
 
             Room room = optionalRoom.get();
 
-            room.setRoomType(roomDTO.getRoomType());
-            room.setMaxCapacity(roomDTO.getMaxCapacity());
-            room.setPrice(room.getPrice());
-            room.setAvailable(roomDTO.getAvailable());
+            if (roomDTO.getRoomType()!= null)
+                room.setRoomType(roomDTO.getRoomType());
+
+            if (roomDTO.getMaxCapacity()!= null)
+                room.setMaxCapacity(roomDTO.getMaxCapacity());
+
+            if (roomDTO.getPrice()!= null)
+                room.setPrice(roomDTO.getPrice());
+
+            if (roomDTO.getAvailable()!= null)
+                room.setAvailable(roomDTO.getAvailable());
 
             roomRepository.save(room);
 
