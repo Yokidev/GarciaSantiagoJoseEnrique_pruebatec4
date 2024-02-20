@@ -8,10 +8,10 @@ import java.util.List;
 
 public interface IRoomService {
 
-    public List<Room> getRooms();
-    public void saveRoom(RoomDTO room);
-    public void deleteRoom(Long id);
-    public Room findRoom(Long id);
-    public void editRoom(RoomDTO roomDTO, Long id);
+    List<Room> getRooms();
+    void saveRoom(RoomDTO room);
+    void deleteRoom(Long id);
+    Room findRoom(Long id);
+    void editRoom(RoomDTO roomDTO, Long id);
 
 }

@@ -8,10 +8,10 @@ import java.util.List;
 
 public interface IHotelService {
 
-    public List<Hotel> getHotels();
-    public void saveHotel(HotelDTO hotel);
-    public void deleteHotel(Long id);
-    public Hotel findHotel(Long id);
-    public void editHotel(HotelDTO hotelDTO, Long id);
-    public List<HotelDTO> findHotelsByCityAndDateBetween(String city, LocalDate dateFrom, LocalDate dateTo);
+    List<Hotel> getHotels();
+    void saveHotel(HotelDTO hotel);
+    void deleteHotel(Long id);
+    Hotel findHotel(Long id);
+    void editHotel(HotelDTO hotelDTO, Long id);
+    List<HotelDTO> findHotelsByCityAndDateBetween(String city, LocalDate dateFrom, LocalDate dateTo);
 }

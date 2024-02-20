@@ -75,7 +75,6 @@ public class RoomService implements IRoomService{
     @Override
     public Room findRoom(Long id) {
         Optional<Room> optionalRoom = roomRepository.findById(id);
-
         if (optionalRoom.isPresent()){
             return optionalRoom.get();
         }else {

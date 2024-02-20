@@ -11,11 +11,11 @@ import java.util.Optional;
 
 public interface IFlightService {
 
-    public List<Flight> getFlights();
-    public void saveFlight(FlightDTO flightDTO);
-    public void deleteFlight(Long id);
-    public Flight findFlight(Long id);
-    public void editFlight(FlightDTO flightDTO, Long id);
+    List<Flight> getFlights();
+    void saveFlight(FlightDTO flightDTO);
+    void deleteFlight(Long id);
+    Flight findFlight(Long id);
+    void editFlight(FlightDTO flightDTO, Long id);
     List<Flight> findByOriginAndDestinationAndDateBetween(String origin, String destination, LocalDate startDate, LocalDate endDate);
 
 

@@ -4,8 +4,11 @@ package com.hackaboss.pruebatec4.controller;
 import com.hackaboss.pruebatec4.dto.FlightDTO;
 import com.hackaboss.pruebatec4.model.Flight;
 import com.hackaboss.pruebatec4.service.IFlightService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -19,48 +22,70 @@ public class FlightController {
     private IFlightService flightService;
 
     @GetMapping("/flights")
-    public List<Flight> getFlights(){
-        return flightService.getFlights();
+    public ResponseEntity<List<Flight>> getFlights(){
+        List<Flight> flightList = flightService.getFlights();
+        if (flightList.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(flightList, HttpStatus.OK);
     }
 
     @GetMapping("/flights/{id}")
-    public Flight getFlightById(@PathVariable Long id){
-        return flightService.findFlight(id);
+    public ResponseEntity<Flight> getFlightById(@PathVariable Long id){
+        try {
+            Flight flight = flightService.findFlight(id);
+            return new ResponseEntity<>(flight, HttpStatus.OK);
+        }catch (EntityNotFoundException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
 
     @GetMapping("/flightsFiltered")
-    public List<Flight> getFlightsByOrigenAndDestinationAndDateBetween(
+    public ResponseEntity<List<Flight>> getFlightsByOrigenAndDestinationAndDateBetween(
             @RequestParam String origin,
             @RequestParam String destination,
             @RequestParam @DateTimeFormat(pattern = "yyyy/MM/dd") LocalDate dateFrom,
             @RequestParam @DateTimeFormat(pattern = "yyyy/MM/dd") LocalDate dateTo
             ){
-        return flightService.findByOriginAndDestinationAndDateBetween(origin, destination, dateFrom, dateTo);
+
+        List<Flight> flightList = flightService.findByOriginAndDestinationAndDateBetween(origin, destination, dateFrom, dateTo);
+        if (flightList.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(flightList, HttpStatus.OK);
+
     }
 
     @PostMapping("/flights/new")
-    public String createFlight(@RequestBody FlightDTO flightDTO){
+    public ResponseEntity<String> createFlight(@RequestBody FlightDTO flightDTO){
 
         flightService.saveFlight(flightDTO);
+        return new ResponseEntity<>("Vuelo creado", HttpStatus.CREATED);
 
-        return "Vuelo creado";
     }
 
     @PutMapping("/flights/edit/{id}")
-    public String editFlight(@PathVariable Long id, @RequestBody FlightDTO flightDTO){
+    public ResponseEntity<String> editFlight(@PathVariable Long id, @RequestBody FlightDTO flightDTO){
 
-        flightService.editFlight(flightDTO, id);
+        try {
+            flightService.editFlight(flightDTO, id);
+            return new ResponseEntity<>("Vuelo editado", HttpStatus.OK);
+        }catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
 
-        return "Vuelo editado";
     }
 
     @DeleteMapping("/flights/delete/{id}")
-    public String deleteFlight(@PathVariable Long id){
+    public ResponseEntity<String> deleteFlight(@PathVariable Long id){
+        try {
+            flightService.deleteFlight(id);
+            return new ResponseEntity<>("Vuelo borrado", HttpStatus.OK);
+        }catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
 
-        flightService.deleteFlight(id);
-
-        return "Vuelo borrado";
     }
 
 }

@@ -9,9 +9,9 @@ import java.util.List;
 
 public interface IFlightBookingService {
 
-    public List<FlightBooking> getFlightBookings();
-    public Double saveFlightBooking(FlightBookingDTO flightBookingDTO) throws FlightBookingDataException;
-    public void deleteFlightBooking(Long id);
-    public FlightBooking findFlightBooking(Long id);
+    List<FlightBooking> getFlightBookings();
+    Double saveFlightBooking(FlightBookingDTO flightBookingDTO) throws FlightBookingDataException;
+    void deleteFlightBooking(Long id);
+    FlightBooking findFlightBooking(Long id);
 
 }

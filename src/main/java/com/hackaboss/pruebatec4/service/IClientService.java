@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface IClientService {
 
-    public List<Client> getClients();
-    public void saveClient(Client client);
-    public void deleteClient(Long id);
-    public Client findClient(Long id);
+    List<Client> getClients();
+    void saveClient(Client client);
+    void deleteClient(Long id);
+    Client findClient(Long id);
 
 }

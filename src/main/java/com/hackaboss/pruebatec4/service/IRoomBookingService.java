@@ -9,10 +9,10 @@ import java.util.List;
 
 public interface IRoomBookingService {
 
-    public List<RoomBooking> getRoomBookings();
-    public Double saveRoomBooking(RoomBookingDTO roomBooking) throws RoomBookingDataException;
-    public void deleteRoomBooking(Long id);
-    public RoomBooking findRoomBooking(Long id);
+    List<RoomBooking> getRoomBookings();
+    Double saveRoomBooking(RoomBookingDTO roomBooking) throws RoomBookingDataException;
+    void deleteRoomBooking(Long id);
+    RoomBooking findRoomBooking(Long id);
 
 
 }

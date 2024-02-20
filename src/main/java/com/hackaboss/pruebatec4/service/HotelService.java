@@ -2,7 +2,6 @@ package com.hackaboss.pruebatec4.service;
 
 import com.hackaboss.pruebatec4.dto.HotelDTO;
 import com.hackaboss.pruebatec4.dto.RoomDTO;
-import com.hackaboss.pruebatec4.exceptions.RoomBookingDataException;
 import com.hackaboss.pruebatec4.model.Hotel;
 import com.hackaboss.pruebatec4.model.Room;
 import com.hackaboss.pruebatec4.repository.HotelRepository;
@@ -107,9 +106,6 @@ public class HotelService implements IHotelService{
         List<Hotel> listHotel = hotelRepository.findByCity(city);
 
         List<HotelDTO> listHotelDTO = new ArrayList<>();
-
-        if (listHotel.isEmpty())
-            throw new EntityNotFoundException("No hay hoteles que coincidan con la busqueda");
 
         for (Hotel hotel:listHotel){
 

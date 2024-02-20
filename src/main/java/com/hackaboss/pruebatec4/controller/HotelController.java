@@ -3,8 +3,11 @@ package com.hackaboss.pruebatec4.controller;
 import com.hackaboss.pruebatec4.dto.HotelDTO;
 import com.hackaboss.pruebatec4.model.Hotel;
 import com.hackaboss.pruebatec4.service.IHotelService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -19,52 +22,69 @@ public class HotelController {
 
 
     @GetMapping("/hotels")
-    public List<Hotel> getHotels(){
-        return hotelService.getHotels();
+    public ResponseEntity<List<Hotel>> getHotels(){
+        List<Hotel> hotelList = hotelService.getHotels();
+        if (hotelList.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(hotelList, HttpStatus.OK);
     }
 
 
     @GetMapping("/hotels/{id}")
-    public Hotel getHotelById(@PathVariable Long id){
-        return hotelService.findHotel(id);
+    public ResponseEntity<Hotel> getHotelById(@PathVariable Long id){
+        try {
+            Hotel hotel = hotelService.findHotel(id);
+            return new ResponseEntity<>(hotel, HttpStatus.OK);
+        }catch (EntityNotFoundException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
 
-    /*Hoteles filtrados
-    public Hotel getHotelByDateAndDestination()
-    * */
     @GetMapping("/hotelsFiltered")
-    public List<HotelDTO> getHotelsByCityAndDateBetween(
+    public ResponseEntity<List<HotelDTO>> getHotelsByCityAndDateBetween(
             @RequestParam String city,
             @RequestParam @DateTimeFormat(pattern = "yyyy/MM/dd") LocalDate dateFrom,
             @RequestParam @DateTimeFormat(pattern = "yyyy/MM/dd") LocalDate dateTo
     ){
-        return hotelService.findHotelsByCityAndDateBetween(city, dateFrom, dateTo);
+        List<HotelDTO> hotelList = hotelService.findHotelsByCityAndDateBetween(city, dateFrom, dateTo);
+        if (hotelList.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(hotelList, HttpStatus.OK);
     }
 
 
     @PostMapping("/hotels/new")
-    public String createHotel(@RequestBody HotelDTO hotelDto){
+    public ResponseEntity<String> createHotel(@RequestBody HotelDTO hotelDto){
 
         hotelService.saveHotel(hotelDto);
+        return new ResponseEntity<>("Hotel creado", HttpStatus.CREATED);
 
-        return "Hotel creado";
     }
 
     @PutMapping("/hotels/edit/{id}")
-    public String editHotel(@PathVariable Long id, @RequestBody HotelDTO hotelDTO){
-        hotelService.editHotel(hotelDTO, id);
+    public ResponseEntity<String> editHotel(@PathVariable Long id, @RequestBody HotelDTO hotelDTO){
 
-        return "Hotel editado";
+        try {
+            hotelService.editHotel(hotelDTO, id);
+            return new ResponseEntity<>("Hotel editado", HttpStatus.OK);
+        }catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
 
     @DeleteMapping("/hotels/delete/{id}")
-    public String deleteHotel(@PathVariable Long id){
+    public ResponseEntity<String> deleteHotel(@PathVariable Long id){
 
-        hotelService.deleteHotel(id);
-
-        return "Hotel borrado";
+        try {
+            hotelService.deleteHotel(id);
+            return new ResponseEntity<>("Hotel borrado", HttpStatus.OK);
+        }catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
 }

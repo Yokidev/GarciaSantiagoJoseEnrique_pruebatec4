@@ -129,7 +129,7 @@ public class FlightBookingService implements IFlightBookingService{
 
             flightRepository.save(flight);
 
-            flightBookingRepository.deleteById(id);
+            flightBookingRepository.delete(flightBooking);
 
         } else {
             throw new EntityNotFoundException("Reserva de vuelo no encontrada");
