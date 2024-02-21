@@ -1,6 +1,7 @@
 package com.hackaboss.pruebatec4.controller;
 
 import com.hackaboss.pruebatec4.dto.HotelDTO;
+import com.hackaboss.pruebatec4.exceptions.HotelExistException;
 import com.hackaboss.pruebatec4.model.Hotel;
 import com.hackaboss.pruebatec4.service.IHotelService;
 import jakarta.persistence.EntityNotFoundException;
@@ -58,9 +59,13 @@ public class HotelController {
 
     @PostMapping("/hotels/new")
     public ResponseEntity<String> createHotel(@RequestBody HotelDTO hotelDto){
+        try {
+            hotelService.saveHotel(hotelDto);
+            return new ResponseEntity<>("Hotel creado", HttpStatus.CREATED);
+        }catch (HotelExistException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
 
-        hotelService.saveHotel(hotelDto);
-        return new ResponseEntity<>("Hotel creado", HttpStatus.CREATED);
 
     }
 

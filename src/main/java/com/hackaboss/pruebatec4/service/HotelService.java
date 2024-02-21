@@ -2,6 +2,7 @@ package com.hackaboss.pruebatec4.service;
 
 import com.hackaboss.pruebatec4.dto.HotelDTO;
 import com.hackaboss.pruebatec4.dto.RoomDTO;
+import com.hackaboss.pruebatec4.exceptions.HotelExistException;
 import com.hackaboss.pruebatec4.model.Hotel;
 import com.hackaboss.pruebatec4.model.Room;
 import com.hackaboss.pruebatec4.repository.HotelRepository;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class HotelService implements IHotelService{
@@ -33,7 +33,10 @@ public class HotelService implements IHotelService{
     }
 
     @Override
-    public void saveHotel(HotelDTO hotelDto) {
+    public void saveHotel(HotelDTO hotelDto) throws HotelExistException {
+
+        if (AlreadyExist(hotelDto))
+            throw new HotelExistException("Hotel ya existente");
 
         Hotel newHotel = new Hotel();
 
@@ -50,53 +53,43 @@ public class HotelService implements IHotelService{
 
     }
 
+    private boolean AlreadyExist(HotelDTO hotelDto) {
+        Hotel hotel = hotelRepository.findByNameAndCity(hotelDto.getName(), hotelDto.getCity());
+        if (hotel == null){
+            return false;
+        }
+        return true;
+    }
+
+
     @Override
     public void deleteHotel(Long id) {
-        Optional<Hotel> optionalHotel = hotelRepository.findById(id);
-        if (optionalHotel.isPresent()){
+        Hotel hotel = hotelRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Hotel no encontrado"));
 
-            Hotel hotel = optionalHotel.get();
-
-            for (Room room: hotel.getRooms()){
-                roomRepository.deleteById(room.getId());
-            }
-
-            hotelRepository.deleteById(id);
-        }else {
-            throw new EntityNotFoundException("Hotel no encontrado");
+        for (Room room : hotel.getRooms()) {
+            roomRepository.deleteById(room.getId());
         }
+
+        hotelRepository.deleteById(id);
     }
 
     @Override
     public Hotel findHotel(Long id) {
-        Optional<Hotel> optionalHotel = hotelRepository.findById(id);
-
-        if (optionalHotel.isPresent()){
-            return optionalHotel.get();
-        }else {
-            throw new EntityNotFoundException("Hotel no encontrado");
-        }
-
+        return hotelRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Hotel no encontrado"));
     }
 
     @Override
     public void editHotel(HotelDTO hotelDTO, Long id) {
 
-        Optional<Hotel> optionalHotel = hotelRepository.findById(id);
-        if (optionalHotel.isPresent()){
-            Hotel hotel = optionalHotel.get();
+        Hotel hotel = hotelRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Hotel no encontrado"));
 
-            if (hotelDTO.getName()!= null)
-                hotel.setName(hotelDTO.getName());
+        if (hotelDTO.getName()!= null)
+            hotel.setName(hotelDTO.getName());
 
-            if (hotelDTO.getCity()!= null)
-                hotel.setCity(hotelDTO.getCity());
+        if (hotelDTO.getCity()!= null)
+            hotel.setCity(hotelDTO.getCity());
 
-            hotelRepository.save(hotel);
-
-        }else {
-            throw new EntityNotFoundException("Hotel no encontrado");
-        }
+        hotelRepository.save(hotel);
 
     }
 

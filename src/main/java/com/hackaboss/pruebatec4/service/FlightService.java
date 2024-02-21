@@ -48,66 +48,50 @@ public class FlightService implements IFlightService{
     @Override
     public void deleteFlight(Long id) {
 
-        Optional<Flight> optionalFlight = flightRepository.findById(id);
-        if (optionalFlight.isPresent()){
-            Flight flight = optionalFlight.get();
+        Flight flight = flightRepository.findById(id).orElseThrow(()->new EntityNotFoundException("Vuelo no encontrado"));
 
-            for (FlightBooking flightBooking: flight.getFlightBookings()){
-                flightBookingRepository.deleteById(flightBooking.getId());
-            }
-
-            flightRepository.deleteById(id);
-
-        }else {
-            throw new EntityNotFoundException("Vuelo no encontrado");
+        for (FlightBooking flightBooking: flight.getFlightBookings()){
+            flightBookingRepository.deleteById(flightBooking.getId());
         }
+
+        flightRepository.deleteById(id);
 
     }
 
     @Override
     public Flight findFlight(Long id) {
-        Optional<Flight> optionalFlight = flightRepository.findById(id);
-
-        if (optionalFlight.isPresent()){
-            return optionalFlight.get();
-        } else {
-            throw new EntityNotFoundException("Vuelo no encontrado");
-        }
+        return flightRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Vuelo no encontrado"));
     }
 
     @Override
     public void editFlight(FlightDTO flightDto, Long id) {
-        Optional<Flight> optionalFlight = flightRepository.findById(id);
 
-        if (optionalFlight.isPresent()){
-            Flight flight = optionalFlight.get();
+        Flight flight = flightRepository.findById(id).orElseThrow(()->new EntityNotFoundException("Vuelo no encontrado"));
 
-            if (flightDto.getOrigin()!=null)
-                flight.setOrigin(flightDto.getOrigin());
+        if (flightDto.getOrigin()!=null)
+            flight.setOrigin(flightDto.getOrigin());
 
-            if (flightDto.getDestination()!=null)
-                flight.setDestination(flightDto.getDestination());
+        if (flightDto.getDestination()!=null)
+            flight.setDestination(flightDto.getDestination());
 
-            if (flightDto.getDate()!=null)
-                flight.setDate(flightDto.getDate());
+        if (flightDto.getDate()!=null)
+            flight.setDate(flightDto.getDate());
 
-            if (flightDto.getPrice()!=null)
-                flight.setPrice(flightDto.getPrice());
+        if (flightDto.getPrice()!=null)
+            flight.setPrice(flightDto.getPrice());
 
-            if (flightDto.getTypeSeat()!=null)
-                flight.setTypeSeat(flightDto.getTypeSeat());
+        if (flightDto.getTypeSeat()!=null)
+            flight.setTypeSeat(flightDto.getTypeSeat());
 
-            if (flightDto.getTotalSeat()!=null)
-                flight.setTotalSeat(flightDto.getTotalSeat());
+        if (flightDto.getTotalSeat()!=null)
+            flight.setTotalSeat(flightDto.getTotalSeat());
 
-            if (flightDto.getBookedSeat()!=null)
-                flight.setBookedSeat(flightDto.getBookedSeat());
+        if (flightDto.getBookedSeat()!=null)
+            flight.setBookedSeat(flightDto.getBookedSeat());
 
-            flightRepository.save(flight);
+        flightRepository.save(flight);
 
-        } else {
-            throw new EntityNotFoundException("Vuelo no encontrado");
-        }
     }
 
     @Override

@@ -126,22 +126,15 @@ public class RoomBookingService implements IRoomBookingService{
 
     @Override
     public void deleteRoomBooking(Long id) {
-        Optional<RoomBooking> optionalRoomBooking = roomBookingRepository.findById(id);
-        if (optionalRoomBooking.isPresent()){
-            roomBookingRepository.deleteById(id);
-        }else {
-            throw new EntityNotFoundException("Reserva de habitacion no encontrada");
-        }
+        RoomBooking roomBooking = roomBookingRepository.findById(id).orElseThrow(()->new EntityNotFoundException("Reserva de habitacion no encontrada"));
+        roomBookingRepository.delete(roomBooking);
+
     }
 
     @Override
     public RoomBooking findRoomBooking(Long id) {
-        Optional<RoomBooking> optionalRoomBooking = roomBookingRepository.findById(id);
-        if (optionalRoomBooking.isPresent()){
-            return optionalRoomBooking.get();
-        }else {
-            throw new EntityNotFoundException("Reserva de habitacion no encontrada");
-        }
+        return roomBookingRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Reserva de habitacion no encontrada"));
     }
 
 }

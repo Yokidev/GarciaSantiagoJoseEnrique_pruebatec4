@@ -35,78 +35,55 @@ public class RoomService implements IRoomService{
     @Override
     public void saveRoom(RoomDTO roomDto) {
 
-        Optional<Hotel> optionalHotel = hotelRepository.findById(roomDto.getIdHotel());
-        if (optionalHotel.isPresent()){
+        Hotel hotel = hotelRepository.findById(roomDto.getIdHotel()).orElseThrow(() -> new EntityNotFoundException("Hotel no encontrado"));
 
-            Hotel hotel = optionalHotel.get();
+        Room newRoom = new Room();
 
-            Room newRoom = new Room();
+        newRoom.setHotel(hotel);
+        newRoom.setRoomType(roomDto.getRoomType());
+        newRoom.setMaxCapacity(roomDto.getMaxCapacity());
+        newRoom.setPrice(roomDto.getPrice());
+        newRoom.setAvailable(roomDto.getAvailable());
 
-            newRoom.setHotel(hotel);
-            newRoom.setRoomType(roomDto.getRoomType());
-            newRoom.setMaxCapacity(roomDto.getMaxCapacity());
-            newRoom.setPrice(roomDto.getPrice());
-            newRoom.setAvailable(roomDto.getAvailable());
-
-            roomRepository.save(newRoom);
-        }else {
-            throw new EntityNotFoundException("Hotel no encontrado");
-        }
+        roomRepository.save(newRoom);
 
     }
 
     @Override
     public void deleteRoom(Long id) {
-        Optional<Room> optionalRoom = roomRepository.findById(id);
-        if (optionalRoom.isPresent()){
-            Room room = optionalRoom.get();
+        Room room = roomRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Habitacion no encontrada"));
 
-            for (RoomBooking roomBooking: room.getRoomBookings()){
-                roomBookingRepository.deleteById(roomBooking.getId());
-            }
-
-            roomRepository.deleteById(id);
-
-        }else {
-            throw new EntityNotFoundException("Habitacion no encontrada");
+        for (RoomBooking roomBooking: room.getRoomBookings()){
+            roomBookingRepository.deleteById(roomBooking.getId());
         }
+
+        roomRepository.deleteById(id);
+
     }
 
     @Override
     public Room findRoom(Long id) {
-        Optional<Room> optionalRoom = roomRepository.findById(id);
-        if (optionalRoom.isPresent()){
-            return optionalRoom.get();
-        }else {
-            throw new EntityNotFoundException("Habitacion no encontrada");
-        }
+        return roomRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Habitacion no encontrada"));
     }
 
     @Override
     public void editRoom(RoomDTO roomDTO, Long id) {
 
-        Optional<Room> optionalRoom = roomRepository.findById(id);
-        if (optionalRoom.isPresent()){
+        Room room = roomRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Habitacion no encontrada"));
 
-            Room room = optionalRoom.get();
-
-            if (roomDTO.getRoomType()!= null)
+        if (roomDTO.getRoomType()!= null)
                 room.setRoomType(roomDTO.getRoomType());
 
-            if (roomDTO.getMaxCapacity()!= null)
-                room.setMaxCapacity(roomDTO.getMaxCapacity());
+        if (roomDTO.getMaxCapacity()!= null)
+            room.setMaxCapacity(roomDTO.getMaxCapacity());
 
-            if (roomDTO.getPrice()!= null)
-                room.setPrice(roomDTO.getPrice());
+        if (roomDTO.getPrice()!= null)
+            room.setPrice(roomDTO.getPrice());
 
-            if (roomDTO.getAvailable()!= null)
-                room.setAvailable(roomDTO.getAvailable());
+        if (roomDTO.getAvailable()!= null)
+            room.setAvailable(roomDTO.getAvailable());
 
-            roomRepository.save(room);
-
-        }else {
-            throw new EntityNotFoundException("Habitacion no encontrada");
-        }
+        roomRepository.save(room);
 
     }
 

@@ -116,36 +116,26 @@ public class FlightBookingService implements IFlightBookingService{
 
     @Override
     public void deleteFlightBooking(Long id) {
-        Optional<FlightBooking> optionalFlightBooking = flightBookingRepository.findById(id);
-        if (optionalFlightBooking.isPresent()){
-            FlightBooking flightBooking = optionalFlightBooking.get();
+        FlightBooking flightBooking = flightBookingRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Reserva de vuelo no encontrada"));
 
-            //Liberamos los asientos de la reserva que se va a eliminar
-            Flight flight = flightBooking.getFlight();
-            Integer bookedSeats = flight.getBookedSeat();
-            Integer releasedSeats = flightBooking.getNumberTickets();
+        Flight flight = flightBooking.getFlight();
+        int releasedSeats = flightBooking.getNumberTickets();
 
-            flight.setBookedSeat(bookedSeats-releasedSeats);
+        updateFlightSeats(flight, releasedSeats);
 
-            flightRepository.save(flight);
+        flightBookingRepository.delete(flightBooking);
+    }
 
-            flightBookingRepository.delete(flightBooking);
-
-        } else {
-            throw new EntityNotFoundException("Reserva de vuelo no encontrada");
-        }
+    private void updateFlightSeats(Flight flight, int releasedSeats) {
+        int bookedSeats = flight.getBookedSeat();
+        flight.setBookedSeat(bookedSeats - releasedSeats);
+        flightRepository.save(flight);
     }
 
     @Override
     public FlightBooking findFlightBooking(Long id) {
-
-        Optional<FlightBooking> optionalFlightBooking = flightBookingRepository.findById(id);
-        if (optionalFlightBooking.isPresent()){
-            return optionalFlightBooking.get();
-        }else {
-            throw new EntityNotFoundException("Reserva de vuelo no encontrada");
-        }
-
+        return flightBookingRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Reserva de vuelo no encontrada"));
     }
 
 }
