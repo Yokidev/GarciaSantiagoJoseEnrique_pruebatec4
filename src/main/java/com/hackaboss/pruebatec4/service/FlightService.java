@@ -2,8 +2,6 @@ package com.hackaboss.pruebatec4.service;
 
 import com.hackaboss.pruebatec4.dto.FlightDTO;
 import com.hackaboss.pruebatec4.model.Flight;
-import com.hackaboss.pruebatec4.model.FlightBooking;
-import com.hackaboss.pruebatec4.repository.FlightBookingRepository;
 import com.hackaboss.pruebatec4.repository.FlightRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -97,7 +94,7 @@ public class FlightService implements IFlightService{
      * Metodo usado para generar los codigos de los Vuelos.
      * @param nombre1
      * @param nombre2
-     * @return
+     * @return String code
      */
     public static String codeGenerator(String nombre1, String nombre2 ){
 

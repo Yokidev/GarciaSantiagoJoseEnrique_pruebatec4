@@ -2,7 +2,6 @@ package com.hackaboss.pruebatec4.service;
 
 import com.hackaboss.pruebatec4.dto.ClientDTO;
 import com.hackaboss.pruebatec4.dto.RoomBookingDTO;
-import com.hackaboss.pruebatec4.exceptions.FlightBookingDataException;
 import com.hackaboss.pruebatec4.exceptions.RoomBookingDataException;
 import com.hackaboss.pruebatec4.model.Client;
 import com.hackaboss.pruebatec4.model.Room;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class RoomBookingService implements IRoomBookingService{
