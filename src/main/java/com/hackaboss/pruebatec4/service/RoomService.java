@@ -53,10 +53,6 @@ public class RoomService implements IRoomService{
     public void deleteRoom(Long id) {
         Room room = roomRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Habitacion no encontrada"));
 
-        for (RoomBooking roomBooking: room.getRoomBookings()){
-            roomBookingRepository.deleteById(roomBooking.getId());
-        }
-
         roomRepository.deleteById(id);
 
     }

@@ -133,8 +133,7 @@ public class RoomBookingService implements IRoomBookingService{
 
     @Override
     public RoomBooking findRoomBooking(Long id) {
-        return roomBookingRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Reserva de habitacion no encontrada"));
+        return roomBookingRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Reserva de habitacion no encontrada"));
     }
 
 }

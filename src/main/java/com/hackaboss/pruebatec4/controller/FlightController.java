@@ -6,11 +6,11 @@ import com.hackaboss.pruebatec4.model.Flight;
 import com.hackaboss.pruebatec4.service.IFlightService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -84,6 +84,8 @@ public class FlightController {
             return new ResponseEntity<>("Vuelo borrado", HttpStatus.OK);
         }catch (EntityNotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }catch (DataIntegrityViolationException e){
+            return new ResponseEntity<>("No se puede eliminar el vuelo porque tiene reservas asociadas.", HttpStatus.BAD_REQUEST);
         }
 
     }

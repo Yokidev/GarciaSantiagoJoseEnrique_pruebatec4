@@ -6,6 +6,7 @@ import com.hackaboss.pruebatec4.model.Room;
 import com.hackaboss.pruebatec4.service.IRoomService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -69,6 +70,8 @@ public class RoomController {
             return new ResponseEntity<>("Habitacion borrada", HttpStatus.OK);
         }catch (EntityNotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }catch (DataIntegrityViolationException e){
+            return new ResponseEntity<>("No se puede eliminar la habitacion porque tiene reservas asociadas.", HttpStatus.BAD_REQUEST);
         }
     }
 

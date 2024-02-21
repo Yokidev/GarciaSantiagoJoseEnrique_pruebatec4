@@ -6,6 +6,7 @@ import com.hackaboss.pruebatec4.model.Hotel;
 import com.hackaboss.pruebatec4.service.IHotelService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -89,6 +90,8 @@ public class HotelController {
             return new ResponseEntity<>("Hotel borrado", HttpStatus.OK);
         }catch (EntityNotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }catch (DataIntegrityViolationException e){
+            return new ResponseEntity<>("No se puede eliminar el hotel porque tiene reservas asociadas.", HttpStatus.BAD_REQUEST);
         }
     }
 

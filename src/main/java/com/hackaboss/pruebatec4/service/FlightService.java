@@ -50,10 +50,6 @@ public class FlightService implements IFlightService{
 
         Flight flight = flightRepository.findById(id).orElseThrow(()->new EntityNotFoundException("Vuelo no encontrado"));
 
-        for (FlightBooking flightBooking: flight.getFlightBookings()){
-            flightBookingRepository.deleteById(flightBooking.getId());
-        }
-
         flightRepository.deleteById(id);
 
     }
