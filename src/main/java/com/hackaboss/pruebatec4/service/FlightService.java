@@ -20,8 +20,6 @@ public class FlightService implements IFlightService{
     @Autowired
     FlightRepository flightRepository;
 
-    @Autowired
-    FlightBookingRepository flightBookingRepository;
 
     @Override
     public List<Flight> getFlights() {
@@ -50,7 +48,7 @@ public class FlightService implements IFlightService{
 
         Flight flight = flightRepository.findById(id).orElseThrow(()->new EntityNotFoundException("Vuelo no encontrado"));
 
-        flightRepository.deleteById(id);
+        flightRepository.delete(flight);
 
     }
 

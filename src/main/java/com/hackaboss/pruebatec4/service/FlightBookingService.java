@@ -35,83 +35,71 @@ public class FlightBookingService implements IFlightBookingService{
 
     @Override
     public Double saveFlightBooking(FlightBookingDTO flightBookingDTO) throws FlightBookingDataException {
-
-        //Comprobamos si existe el vuelo
         Optional<Flight> optionalFlight = flightRepository.findByCode(flightBookingDTO.getCode());
-        if (optionalFlight.isPresent()){
-            Flight flight = optionalFlight.get();
-            //Comprobamos que los datos del vuelo y la reserva son los mismos
-            if (flight.getDestination().equals(flightBookingDTO.getDestination()) &&
-                flight.getOrigin().equals(flightBookingDTO.getOrigin()) &&
-                flight.getDate().equals(flightBookingDTO.getDate())
-                ) {
-                //Si existe comprobamos si ha asientos suficientes para la reserva
-                if (flight.getTotalSeat() > (flight.getBookedSeat() + flightBookingDTO.getPassengers().size())) {
-                    FlightBooking flightBooking = new FlightBooking();
 
-                    String nameClient = flightBookingDTO.getPassengers()
-                            .stream()
-                            .findFirst()
-                            .get().getName();
+        Flight flight = optionalFlight.orElseThrow(() -> new EntityNotFoundException("Vuelo no encontrado"));
 
-                    flightBooking.setFlight(flight);
-                    flightBooking.setNameClient(nameClient);
-                    flightBooking.setNumberTickets(flightBookingDTO.getPassengers().size());
+        validateFlightDetails(flight, flightBookingDTO);
 
-                    flightBookingRepository.save(flightBooking);
+        int passengersCount = flightBookingDTO.getPassengers().size();
 
+        if (flightHasEnoughSeats(flight, passengersCount)) {
+            FlightBooking flightBooking = createFlightBooking(flight, flightBookingDTO);
+            updateClientsAndPassengers(flightBookingDTO.getPassengers(), flightBooking);
+            updateFlightSeatsBooked(flight, passengersCount);
 
-                    //Rellenamos la lista de clientes
-                    for (ClientDTO clientDTO : flightBookingDTO.getPassengers()) {
-
-                        //si ya existen les añadimos la reserva
-                        Optional<Client> optionalClient = clientRepository.findByIdentification(clientDTO.getIdentification());
-                        if (optionalClient.isPresent()) {
-                            Client client = optionalClient.get();
-                            client.addFlightBooking(flightBooking);
-                            clientRepository.save(client);
-
-                            //añadimos el pasajero a la reserva
-                            flightBooking.addPassenger(client);
-                            flightBookingRepository.save(flightBooking);
-
-                        } else {
-                            // si no existe el cliente lo creamos
-                            Client newClient = new Client();
-                            newClient.setName(clientDTO.getName());
-                            newClient.setSurname(clientDTO.getSurname());
-                            newClient.setBirthdate(clientDTO.getBirthdate());
-                            newClient.setIdentification(clientDTO.getIdentification());
-                            newClient.addFlightBooking(flightBooking);
-
-                            clientRepository.save(newClient);
-
-                            //añadimos el pasajero a la reserva
-                            flightBooking.addPassenger(newClient);
-                            flightBookingRepository.save(flightBooking);
-
-                        }
-
-                    }
-
-                    //Actualizamos el numero de asientos
-                    int newFlightTotalBookedSeat = flight.getBookedSeat() + flightBookingDTO.getPassengers().size();
-                    flight.setBookedSeat(newFlightTotalBookedSeat);
-
-                    flightRepository.save(flight);
-
-                } else {
-                    throw new FlightBookingDataException("El vuelo no admite tantos pasajeros");
-                }
-            }else {
-                throw new FlightBookingDataException("Los datos de la reserva no coinciden con los del vuelo");
-            }
-
-        }else {
-            throw new EntityNotFoundException("Vuelo no encontrado");
+            return passengersCount * flight.getPrice();
+        } else {
+            throw new FlightBookingDataException("El vuelo no admite tantos pasajeros");
         }
+    }
 
-        return flightBookingDTO.getPassengers().size()*optionalFlight.get().getPrice();
+    private void validateFlightDetails(Flight flight, FlightBookingDTO flightBookingDTO) throws FlightBookingDataException {
+        if (!flight.getDestination().equals(flightBookingDTO.getDestination()) ||
+                !flight.getOrigin().equals(flightBookingDTO.getOrigin()) ||
+                !flight.getDate().equals(flightBookingDTO.getDate())) {
+            throw new FlightBookingDataException("Los datos de la reserva no coinciden con los del vuelo");
+        }
+    }
+
+    private boolean flightHasEnoughSeats(Flight flight, int passengersCount) {
+        return flight.getTotalSeat() >= (flight.getBookedSeat() + passengersCount);
+    }
+
+    private FlightBooking createFlightBooking(Flight flight, FlightBookingDTO flightBookingDTO) {
+        FlightBooking flightBooking = new FlightBooking();
+        flightBooking.setFlight(flight);
+        flightBooking.setNumberTickets(flightBookingDTO.getPassengers().size());
+        flightBookingRepository.save(flightBooking);
+        return flightBooking;
+    }
+
+    private void updateClientsAndPassengers(List<ClientDTO> passengers, FlightBooking flightBooking) {
+        for (ClientDTO clientDTO : passengers) {
+            Client client = clientRepository.findByIdentification(clientDTO.getIdentification())
+                    .orElseGet(() -> createNewClient(clientDTO));
+
+            client.addFlightBooking(flightBooking);
+            flightBooking.addPassenger(client);
+
+            clientRepository.save(client);
+            flightBookingRepository.save(flightBooking);
+        }
+    }
+
+    private Client createNewClient(ClientDTO clientDTO) {
+        Client newClient = new Client();
+        newClient.setName(clientDTO.getName());
+        newClient.setSurname(clientDTO.getSurname());
+        newClient.setBirthdate(clientDTO.getBirthdate());
+        newClient.setIdentification(clientDTO.getIdentification());
+        return newClient;
+    }
+
+    private void updateFlightSeatsBooked(Flight flight, int passengersCount) {
+        int newFlightTotalBookedSeat = flight.getBookedSeat() + passengersCount;
+        flight.setBookedSeat(newFlightTotalBookedSeat);
+        flightRepository.save(flight);
     }
 
     @Override
@@ -121,12 +109,12 @@ public class FlightBookingService implements IFlightBookingService{
         Flight flight = flightBooking.getFlight();
         int releasedSeats = flightBooking.getNumberTickets();
 
-        updateFlightSeats(flight, releasedSeats);
+        releaseFlightSeats(flight, releasedSeats);
 
         flightBookingRepository.delete(flightBooking);
     }
 
-    private void updateFlightSeats(Flight flight, int releasedSeats) {
+    private void releaseFlightSeats(Flight flight, int releasedSeats) {
         int bookedSeats = flight.getBookedSeat();
         flight.setBookedSeat(bookedSeats - releasedSeats);
         flightRepository.save(flight);

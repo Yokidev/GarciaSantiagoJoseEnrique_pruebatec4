@@ -14,6 +14,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
@@ -36,92 +37,82 @@ public class RoomBookingService implements IRoomBookingService{
         return roomBookingRepository.findAll();
     }
 
-
     @Override
     public Double saveRoomBooking(RoomBookingDTO roomBookingDTO) throws RoomBookingDataException {
 
-        Long numNights = ChronoUnit.DAYS.between(roomBookingDTO.getCheckIn(),roomBookingDTO.getCheckOut());
+        Long numNights = ChronoUnit.DAYS.between(roomBookingDTO.getCheckIn(), roomBookingDTO.getCheckOut());
 
-        //Comprobamos si existe la habitación
-        Optional<Room> optionalRoom = roomRepository.findById(roomBookingDTO.getIdRoom());
-        if (optionalRoom.isPresent()){
-            Room room = optionalRoom.get();
+        Room room = roomRepository.findById(roomBookingDTO.getIdRoom()).orElseThrow(() -> new EntityNotFoundException("Habitacion no encontrada"));
 
-            //Comprobamos que los datos de la habitacion y la reserva son los mismos
-            if (room.getHotel().getName().equals(roomBookingDTO.getHotelName()) &&
-                room.getHotel().getCity().equals(roomBookingDTO.getCity())){
+        validateRoomBookingDates(roomBookingDTO);
+        validateRoomDetails(room, roomBookingDTO);
 
-                //Comprobamos que el numero de huespedes no supera la capacidad de la habitacion
-                if (roomBookingDTO.getHosts().size()<= room.getMaxCapacity()) {
-
-                    //Comprobamos que la reserva nueva no se pisa con una ya existente
-                    if (room.getRoomBookings().stream().anyMatch(
-                            roomBooked -> (roomBookingDTO.getCheckIn().isBefore(roomBooked.getCheckOut())
-                                    && roomBookingDTO.getCheckOut().isAfter(roomBooked.getCheckIn()))
-                    )) {
-                        throw new RoomBookingDataException("Las fechas elegidas para la reserva coinciden con una reserva ya realizada");
-
-                    } else {
-
-                        RoomBooking roomBooking = new RoomBooking();
-
-                        String nameClient = roomBookingDTO.getHosts().stream()
-                                .findFirst()
-                                .get()
-                                .getName();
-
-                        roomBooking.setClientName(nameClient);
-                        roomBooking.setRoom(room);
-                        roomBooking.setCheckIn(roomBookingDTO.getCheckIn());
-                        roomBooking.setCheckOut(roomBookingDTO.getCheckOut());
-
-                        roomBookingRepository.save(roomBooking);
-
-                        //Rellenamos la lista de clientes
-                        for (ClientDTO clientDTO : roomBookingDTO.getHosts()) {
-                            //si ya existen les añadimos la reserva
-                            Optional<Client> optionalClient = clientRepository.findByIdentification(clientDTO.getIdentification());
-                            if (optionalClient.isPresent()) {
-                                Client client = optionalClient.get();
-                                client.addRoomBooking(roomBooking);
-                                clientRepository.save(client);
-
-                                //añadimos el huésped a la reserva
-                                roomBooking.addHosts(client);
-                                roomBookingRepository.save(roomBooking);
-
-                            } else {
-                                // si no existe el cliente lo creamos
-                                Client newClient = new Client();
-                                newClient.setName(clientDTO.getName());
-                                newClient.setSurname(clientDTO.getSurname());
-                                newClient.setBirthdate(clientDTO.getBirthdate());
-                                newClient.setIdentification(clientDTO.getIdentification());
-                                newClient.addRoomBooking(roomBooking);
-
-                                clientRepository.save(newClient);
-
-                                //añadimos el huésped a la reserva
-                                roomBooking.addHosts(newClient);
-                                roomBookingRepository.save(roomBooking);
-
-                            }
-
-                        }
-
-                    }
-                }else {
-                    throw new RoomBookingDataException("El numero de huespedes supera la capacidad de la habitación");
-                }
-            }else {
-                throw new RoomBookingDataException("Los datos de la reserva no coinciden con los de la habitacion");
+        if (roomHasEnoughCapacity(room, roomBookingDTO.getHosts().size())) {
+            if (isBookingDateAvailable(room, roomBookingDTO.getCheckIn(), roomBookingDTO.getCheckOut())) {
+                RoomBooking roomBooking = createRoomBooking(room, roomBookingDTO);
+                updateClientsAndHosts(roomBookingDTO.getHosts(), roomBooking);
+                return numNights * room.getPrice();
+            } else {
+                throw new RoomBookingDataException("Las fechas elegidas para la reserva coinciden con una reserva ya realizada");
             }
-
-        }else {
-            throw new EntityNotFoundException("Habitacion no encontrada");
+        } else {
+            throw new RoomBookingDataException("El numero de huespedes supera la capacidad de la habitación");
         }
+    }
 
-        return numNights*optionalRoom.get().getPrice();
+    private void validateRoomBookingDates(RoomBookingDTO roomBookingDTO) throws RoomBookingDataException {
+        if (roomBookingDTO.getCheckIn().isAfter(roomBookingDTO.getCheckOut())) {
+            throw new RoomBookingDataException("La fecha de check-in no puede ser posterior a la fecha de check-out");
+        }
+    }
+
+    private void validateRoomDetails(Room room, RoomBookingDTO roomBookingDTO) throws RoomBookingDataException {
+        if (!room.getHotel().getName().equals(roomBookingDTO.getHotelName()) ||
+                !room.getHotel().getCity().equals(roomBookingDTO.getCity())) {
+            throw new RoomBookingDataException("Los datos de la reserva no coinciden con los de la habitacion");
+        }
+    }
+
+    private boolean roomHasEnoughCapacity(Room room, int numHosts) {
+        return numHosts <= room.getMaxCapacity();
+    }
+
+    private boolean isBookingDateAvailable(Room room, LocalDate checkIn, LocalDate checkOut) {
+        return room.getRoomBookings().stream().noneMatch(
+                roomBooking -> checkIn.isBefore(roomBooking.getCheckOut()) && checkOut.isAfter(roomBooking.getCheckIn())
+        );
+    }
+
+    private RoomBooking createRoomBooking(Room room, RoomBookingDTO roomBookingDTO) {
+        RoomBooking roomBooking = new RoomBooking();
+        roomBooking.setClientName(roomBookingDTO.getHosts().get(0).getName());
+        roomBooking.setRoom(room);
+        roomBooking.setCheckIn(roomBookingDTO.getCheckIn());
+        roomBooking.setCheckOut(roomBookingDTO.getCheckOut());
+        roomBookingRepository.save(roomBooking);
+        return roomBooking;
+    }
+
+    private void updateClientsAndHosts(List<ClientDTO> hosts, RoomBooking roomBooking) {
+        for (ClientDTO clientDTO : hosts) {
+            Client client = clientRepository.findByIdentification(clientDTO.getIdentification())
+                    .orElseGet(() -> createNewClient(clientDTO));
+
+            client.addRoomBooking(roomBooking);
+            roomBooking.addHosts(client);
+
+            clientRepository.save(client);
+            roomBookingRepository.save(roomBooking);
+        }
+    }
+
+    private Client createNewClient(ClientDTO clientDTO) {
+        Client newClient = new Client();
+        newClient.setName(clientDTO.getName());
+        newClient.setSurname(clientDTO.getSurname());
+        newClient.setBirthdate(clientDTO.getBirthdate());
+        newClient.setIdentification(clientDTO.getIdentification());
+        return newClient;
     }
 
     @Override
