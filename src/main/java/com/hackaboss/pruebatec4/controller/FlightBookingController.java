@@ -19,6 +19,10 @@ public class FlightBookingController {
     @Autowired
     private IFlightBookingService flightBookingService;
 
+    /***
+     * Devuelve la lista de reservas de vuelos
+     * @return ResponseEntity<List<FlightBooking>>
+     */
     @GetMapping("/flight-bookings")
     public ResponseEntity<List<FlightBooking>> getFlightBookings(){
         List<FlightBooking> flightBookingsList = flightBookingService.getFlightBookings();
@@ -28,6 +32,11 @@ public class FlightBookingController {
         return new ResponseEntity<>(flightBookingsList, HttpStatus.OK);
     }
 
+    /***
+     * Devuelve la reserva que coincida con el id proporcionado
+     * @param id
+     * @return
+     */
     @GetMapping("/flight-booking/{id}")
     public ResponseEntity<FlightBooking> getFlightBookingById(@PathVariable Long id){
         try {
@@ -38,6 +47,12 @@ public class FlightBookingController {
         }
     }
 
+    /***
+     * Crea la reserva con los datos proporcionados
+     * @param flightBookingDTO
+     * @return
+     * @throws FlightBookingDataException
+     */
     @PostMapping("/flight-booking/new")
     public ResponseEntity<String> createFlightBooking(@RequestBody FlightBookingDTO flightBookingDTO) throws FlightBookingDataException {
         try {
@@ -51,6 +66,11 @@ public class FlightBookingController {
         }
     }
 
+    /***
+     * Borra la reserva que coincida con la id proporcionada
+     * @param id
+     * @return
+     */
     @DeleteMapping("/flight-booking/delete/{id}")
     public ResponseEntity<String> deleteFlightBooking(@PathVariable Long id){
         try {

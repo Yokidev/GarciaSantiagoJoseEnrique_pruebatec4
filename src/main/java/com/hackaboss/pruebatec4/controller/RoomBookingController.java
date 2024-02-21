@@ -21,6 +21,10 @@ public class RoomBookingController {
     @Autowired
     private IRoomBookingService roomBookingService;
 
+    /***
+     * Devuelve la lista de reservas de habitaciones
+     * @return
+     */
     @GetMapping("/room-bookings")
     public ResponseEntity<List<RoomBooking>> getRoomBookings(){
         List<RoomBooking> roomBookingList = roomBookingService.getRoomBookings();
@@ -30,6 +34,11 @@ public class RoomBookingController {
         return new ResponseEntity<>(roomBookingList, HttpStatus.OK);
     }
 
+    /***
+     * Devuelve la reserva que coincida con el id proporcionado
+     * @param id
+     * @return
+     */
     @GetMapping("/room-booking/{id}")
     public ResponseEntity<RoomBooking> getRoomBookingById(@PathVariable Long id){
         try {
@@ -40,6 +49,12 @@ public class RoomBookingController {
         }
     }
 
+    /***
+     * Crea la reserva con los datos proporcionados
+     * @param roomBookingDTO
+     * @return
+     * @throws RoomBookingDataException
+     */
     @PostMapping("/room-booking/new")
     public ResponseEntity<String> createRoomBooking(@RequestBody RoomBookingDTO roomBookingDTO) throws RoomBookingDataException {
         try {
@@ -55,6 +70,11 @@ public class RoomBookingController {
     }
 
 
+    /***
+     * Borra la reserva que coincida con la id proporcionada
+     * @param id
+     * @return
+     */
     @DeleteMapping("/room-booking/delete/{id}")
     public ResponseEntity<String> deleteRoomBooking(@PathVariable Long id){
 

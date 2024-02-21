@@ -22,7 +22,10 @@ public class HotelController {
     @Autowired
     private IHotelService hotelService;
 
-
+    /***
+     * Devuelve la lista de hoteles
+     * @return
+     */
     @GetMapping("/hotels")
     public ResponseEntity<List<Hotel>> getHotels(){
         List<Hotel> hotelList = hotelService.getHotels();
@@ -32,7 +35,11 @@ public class HotelController {
         return new ResponseEntity<>(hotelList, HttpStatus.OK);
     }
 
-
+    /***
+     * Devuelve el hotel que coincida con el id proporcionado
+     * @param id
+     * @return
+     */
     @GetMapping("/hotels/{id}")
     public ResponseEntity<Hotel> getHotelById(@PathVariable Long id){
         try {
@@ -43,7 +50,13 @@ public class HotelController {
         }
     }
 
-
+    /***
+     * Devuelve una lista de hoteles que coincida con los resultados obtenidos que coincidan con los parametros introducidos
+     * @param city
+     * @param dateFrom
+     * @param dateTo
+     * @return
+     */
     @GetMapping("/hotelsFiltered")
     public ResponseEntity<List<HotelDTO>> getHotelsByCityAndDateBetween(
             @RequestParam String city,
@@ -57,7 +70,11 @@ public class HotelController {
         return new ResponseEntity<>(hotelList, HttpStatus.OK);
     }
 
-
+    /***
+     * Crea el hotel con los datos proporcionados
+     * @param hotelDto
+     * @return
+     */
     @PostMapping("/hotels/new")
     public ResponseEntity<String> createHotel(@RequestBody HotelDTO hotelDto){
         try {
@@ -70,6 +87,12 @@ public class HotelController {
 
     }
 
+    /***
+     * Modifica los parametros de un hotel existente
+     * @param id
+     * @param hotelDTO
+     * @return
+     */
     @PutMapping("/hotels/edit/{id}")
     public ResponseEntity<String> editHotel(@PathVariable Long id, @RequestBody HotelDTO hotelDTO){
 
@@ -81,7 +104,11 @@ public class HotelController {
         }
     }
 
-
+    /***
+     * Borra el hotel que coincida con la id proporcionada
+     * @param id
+     * @return
+     */
     @DeleteMapping("/hotels/delete/{id}")
     public ResponseEntity<String> deleteHotel(@PathVariable Long id){
 

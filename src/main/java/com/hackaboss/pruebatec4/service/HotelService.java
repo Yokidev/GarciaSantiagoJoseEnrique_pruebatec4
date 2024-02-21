@@ -27,11 +27,20 @@ public class HotelService implements IHotelService{
     @Autowired
     private RoomService roomService;
 
+    /***
+     * Devuelve la lista de hoteles de la BBDD
+     * @return
+     */
     @Override
     public List<Hotel> getHotels() {
         return hotelRepository.findAll();
     }
 
+    /***
+     * Guarda un hotel en la BBDD
+     * @param hotelDto
+     * @throws HotelExistException
+     */
     @Override
     public void saveHotel(HotelDTO hotelDto) throws HotelExistException {
 
@@ -53,6 +62,11 @@ public class HotelService implements IHotelService{
 
     }
 
+    /***
+     * Comprueba si un hotel existe en la BBDD
+     * @param hotelDto
+     * @return
+     */
     private boolean AlreadyExist(HotelDTO hotelDto) {
         Hotel hotel = hotelRepository.findByNameAndCity(hotelDto.getName(), hotelDto.getCity());
         if (hotel == null){
@@ -61,7 +75,10 @@ public class HotelService implements IHotelService{
         return true;
     }
 
-
+    /***
+     * Borra un hotel que coincida con la id proporcionada
+     * @param id
+     */
     @Override
     public void deleteHotel(Long id) {
         Hotel hotel = hotelRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Hotel no encontrado"));
@@ -73,11 +90,21 @@ public class HotelService implements IHotelService{
         hotelRepository.deleteById(id);
     }
 
+    /***
+     * Devuelve un hotel que coincida con la id proporcionada
+     * @param id
+     * @return
+     */
     @Override
     public Hotel findHotel(Long id) {
         return hotelRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Hotel no encontrado"));
     }
 
+    /***
+     * Edita el hotel con la informacion proporcionada
+     * @param hotelDTO
+     * @param id
+     */
     @Override
     public void editHotel(HotelDTO hotelDTO, Long id) {
 
@@ -93,6 +120,13 @@ public class HotelService implements IHotelService{
 
     }
 
+    /***
+     * Devuelve una lista de hoteles que coincidan con los parametros de busqueda
+     * @param city
+     * @param dateFrom
+     * @param dateTo
+     * @return
+     */
     @Override
     public List<HotelDTO> findHotelsByCityAndDateBetween(String city, LocalDate dateFrom, LocalDate dateTo) {
 
@@ -118,6 +152,7 @@ public class HotelService implements IHotelService{
                 roomDTO.setRoomType(room.getRoomType());
                 roomDTO.setMaxCapacity(room.getMaxCapacity());
                 roomDTO.setPrice(room.getPrice());
+                roomDTO.setAvailable(room.getAvailable());
 
 
                 hotelDTO.getRooms().add(roomDTO);

@@ -20,6 +20,10 @@ public class RoomController {
     @Autowired
     private IRoomService roomService;
 
+    /***
+     * Devuelve la lista de habitaciones
+     * @return
+     */
     @GetMapping("/rooms")
     public ResponseEntity<List<Room>> getRooms(){
         List<Room> roomList = roomService.getRooms();
@@ -29,6 +33,11 @@ public class RoomController {
         return new ResponseEntity<>(roomList, HttpStatus.OK);
     }
 
+    /***
+     * Devuelve la habitacion que coincida con el id proporcionado
+     * @param id
+     * @return
+     */
     @GetMapping("/rooms/{id}")
     public ResponseEntity<Room> getRoomById(@PathVariable Long id){
         try {
@@ -39,17 +48,28 @@ public class RoomController {
         }
     }
 
+    /***
+     * Crea la habitacion con los datos proporcionados
+     * @param roomDTO
+     * @return
+     */
     @PostMapping("/rooms/new")
-    public ResponseEntity<String> createRoom(@RequestBody RoomDTO room){
+    public ResponseEntity<String> createRoom(@RequestBody RoomDTO roomDTO){
 
         try {
-            roomService.saveRoom(room);
+            roomService.saveRoom(roomDTO);
             return  new ResponseEntity<>("Habitacion creada", HttpStatus.CREATED);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
 
+    /***
+     * Modifica los parametros de una habitacion existente
+     * @param id
+     * @param roomDTO
+     * @return
+     */
     @PutMapping("/rooms/edit/{id}")
     public ResponseEntity<String> editRoom(@PathVariable Long id, @RequestBody RoomDTO roomDTO){
 
@@ -62,6 +82,11 @@ public class RoomController {
 
     }
 
+    /***
+     * Borra la habitacion que coincida con la id proporcionada
+     * @param id
+     * @return
+     */
     @DeleteMapping("/rooms/delete/{id}")
     public ResponseEntity<String> deleteRoom(@PathVariable Long id){
 
@@ -74,7 +99,5 @@ public class RoomController {
             return new ResponseEntity<>("No se puede eliminar la habitacion porque tiene reservas asociadas.", HttpStatus.BAD_REQUEST);
         }
     }
-
-
 
 }

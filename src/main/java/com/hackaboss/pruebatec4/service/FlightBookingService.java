@@ -28,11 +28,21 @@ public class FlightBookingService implements IFlightBookingService{
     @Autowired
     ClientRepository clientRepository;
 
+    /***
+     * Devuelve la lista de reservas
+     * @return
+     */
     @Override
     public List<FlightBooking> getFlightBookings() {
         return flightBookingRepository.findAll();
     }
 
+    /***
+     * Devuelve el costo de la reserva
+     * @param flightBookingDTO
+     * @return
+     * @throws FlightBookingDataException
+     */
     @Override
     public Double saveFlightBooking(FlightBookingDTO flightBookingDTO) throws FlightBookingDataException {
         Optional<Flight> optionalFlight = flightRepository.findByCode(flightBookingDTO.getCode());
@@ -54,6 +64,12 @@ public class FlightBookingService implements IFlightBookingService{
         }
     }
 
+    /***
+     * Valida los datos proporcionados para que coincidan con el vuelo elegido
+     * @param flight
+     * @param flightBookingDTO
+     * @throws FlightBookingDataException
+     */
     private void validateFlightDetails(Flight flight, FlightBookingDTO flightBookingDTO) throws FlightBookingDataException {
         if (!flight.getDestination().equals(flightBookingDTO.getDestination()) ||
                 !flight.getOrigin().equals(flightBookingDTO.getOrigin()) ||
@@ -62,10 +78,22 @@ public class FlightBookingService implements IFlightBookingService{
         }
     }
 
+    /***
+     * Comprueba que haya asientos disponibles para realizar la reserva
+     * @param flight
+     * @param passengersCount
+     * @return
+     */
     private boolean flightHasEnoughSeats(Flight flight, int passengersCount) {
         return flight.getTotalSeat() >= (flight.getBookedSeat() + passengersCount);
     }
 
+    /***
+     * Crea una reserva de vuelo
+     * @param flight
+     * @param flightBookingDTO
+     * @return
+     */
     private FlightBooking createFlightBooking(Flight flight, FlightBookingDTO flightBookingDTO) {
         FlightBooking flightBooking = new FlightBooking();
         flightBooking.setFlight(flight);
@@ -74,6 +102,11 @@ public class FlightBookingService implements IFlightBookingService{
         return flightBooking;
     }
 
+    /***
+     * Actualiza los pasageros y el cliente de una reserva
+     * @param passengers
+     * @param flightBooking
+     */
     private void updateClientsAndPassengers(List<ClientDTO> passengers, FlightBooking flightBooking) {
         for (ClientDTO clientDTO : passengers) {
             Client client = clientRepository.findByIdentification(clientDTO.getIdentification())
@@ -87,6 +120,11 @@ public class FlightBookingService implements IFlightBookingService{
         }
     }
 
+    /***
+     * Crea un nuevo cliente
+     * @param clientDTO
+     * @return
+     */
     private Client createNewClient(ClientDTO clientDTO) {
         Client newClient = new Client();
         newClient.setName(clientDTO.getName());
@@ -96,12 +134,21 @@ public class FlightBookingService implements IFlightBookingService{
         return newClient;
     }
 
+    /***
+     * Actualiza los asientos disponbles de un vuelo
+     * @param flight
+     * @param passengersCount
+     */
     private void updateFlightSeatsBooked(Flight flight, int passengersCount) {
         int newFlightTotalBookedSeat = flight.getBookedSeat() + passengersCount;
         flight.setBookedSeat(newFlightTotalBookedSeat);
         flightRepository.save(flight);
     }
 
+    /***
+     * Borra una reserva que coincida con el id proporcionado
+     * @param id
+     */
     @Override
     public void deleteFlightBooking(Long id) {
         FlightBooking flightBooking = flightBookingRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Reserva de vuelo no encontrada"));
@@ -114,12 +161,22 @@ public class FlightBookingService implements IFlightBookingService{
         flightBookingRepository.delete(flightBooking);
     }
 
+    /***
+     * Libera los asientos que estaban ocupados por la reserva eliminada
+     * @param flight
+     * @param releasedSeats
+     */
     private void releaseFlightSeats(Flight flight, int releasedSeats) {
         int bookedSeats = flight.getBookedSeat();
         flight.setBookedSeat(bookedSeats - releasedSeats);
         flightRepository.save(flight);
     }
 
+    /***
+     * Devuelve una reserva que coincida con la id proporcionada
+     * @param id
+     * @return
+     */
     @Override
     public FlightBooking findFlightBooking(Long id) {
         return flightBookingRepository.findById(id)

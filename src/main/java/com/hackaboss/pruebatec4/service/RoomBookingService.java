@@ -30,11 +30,21 @@ public class RoomBookingService implements IRoomBookingService{
     ClientRepository clientRepository;
 
 
+    /***
+     * Devuelve la lista de reservas
+     * @return
+     */
     @Override
     public List<RoomBooking> getRoomBookings() {
         return roomBookingRepository.findAll();
     }
 
+    /***
+     * Devuelve el costo de la reserva
+     * @param roomBookingDTO
+     * @return
+     * @throws RoomBookingDataException
+     */
     @Override
     public Double saveRoomBooking(RoomBookingDTO roomBookingDTO) throws RoomBookingDataException {
 
@@ -58,12 +68,23 @@ public class RoomBookingService implements IRoomBookingService{
         }
     }
 
+    /***
+     * Valida que las fechas esten en orden correcto
+     * @param roomBookingDTO
+     * @throws RoomBookingDataException
+     */
     private void validateRoomBookingDates(RoomBookingDTO roomBookingDTO) throws RoomBookingDataException {
         if (roomBookingDTO.getCheckIn().isAfter(roomBookingDTO.getCheckOut())) {
             throw new RoomBookingDataException("La fecha de check-in no puede ser posterior a la fecha de check-out");
         }
     }
 
+    /***
+     * Valida que los datos proporcionados coincidan con la habitacion elegida
+     * @param room
+     * @param roomBookingDTO
+     * @throws RoomBookingDataException
+     */
     private void validateRoomDetails(Room room, RoomBookingDTO roomBookingDTO) throws RoomBookingDataException {
         if (!room.getHotel().getName().equals(roomBookingDTO.getHotelName()) ||
                 !room.getHotel().getCity().equals(roomBookingDTO.getCity())) {
@@ -71,16 +92,35 @@ public class RoomBookingService implements IRoomBookingService{
         }
     }
 
+    /***
+     * Valida que el tamaño de la habitacion sea adecuado para el numero de huespedes
+     * @param room
+     * @param numHosts
+     * @return
+     */
     private boolean roomHasEnoughCapacity(Room room, int numHosts) {
         return numHosts <= room.getMaxCapacity();
     }
 
+    /***
+     * Valida que la habitacion este disponible en las fechas elegidas
+     * @param room
+     * @param checkIn
+     * @param checkOut
+     * @return
+     */
     private boolean isBookingDateAvailable(Room room, LocalDate checkIn, LocalDate checkOut) {
         return room.getRoomBookings().stream().noneMatch(
                 roomBooking -> checkIn.isBefore(roomBooking.getCheckOut()) && checkOut.isAfter(roomBooking.getCheckIn())
         );
     }
 
+    /****
+     * Crea la reserva
+     * @param room
+     * @param roomBookingDTO
+     * @return
+     */
     private RoomBooking createRoomBooking(Room room, RoomBookingDTO roomBookingDTO) {
         RoomBooking roomBooking = new RoomBooking();
         roomBooking.setClientName(roomBookingDTO.getHosts().get(0).getName());
@@ -91,6 +131,11 @@ public class RoomBookingService implements IRoomBookingService{
         return roomBooking;
     }
 
+    /***
+     * Actualiza los datos de los clientes y la lista de huespedes
+     * @param hosts
+     * @param roomBooking
+     */
     private void updateClientsAndHosts(List<ClientDTO> hosts, RoomBooking roomBooking) {
         for (ClientDTO clientDTO : hosts) {
             Client client = clientRepository.findByIdentification(clientDTO.getIdentification())
@@ -104,6 +149,11 @@ public class RoomBookingService implements IRoomBookingService{
         }
     }
 
+    /***
+     * Crea un nuevo cliente
+     * @param clientDTO
+     * @return
+     */
     private Client createNewClient(ClientDTO clientDTO) {
         Client newClient = new Client();
         newClient.setName(clientDTO.getName());
@@ -113,6 +163,10 @@ public class RoomBookingService implements IRoomBookingService{
         return newClient;
     }
 
+    /***
+     * Borra la reserva que coincida con el id proporcionado
+     * @param id
+     */
     @Override
     public void deleteRoomBooking(Long id) {
         RoomBooking roomBooking = roomBookingRepository.findById(id).orElseThrow(()->new EntityNotFoundException("Reserva de habitacion no encontrada"));
@@ -120,6 +174,11 @@ public class RoomBookingService implements IRoomBookingService{
 
     }
 
+    /***
+     * Devuelve una reserva que coincida con la id proporcionada
+     * @param id
+     * @return
+     */
     @Override
     public RoomBooking findRoomBooking(Long id) {
         return roomBookingRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Reserva de habitacion no encontrada"));

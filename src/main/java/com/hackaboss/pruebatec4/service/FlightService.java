@@ -17,13 +17,19 @@ public class FlightService implements IFlightService{
     @Autowired
     FlightRepository flightRepository;
 
-
+    /***
+     * Devuelve la lista de vuelos de la BBDD
+     * @return
+     */
     @Override
     public List<Flight> getFlights() {
         return flightRepository.findAll();
     }
 
-
+    /***
+     * Guarda un vuelo en la BBDD
+     * @param flightDto
+     */
     @Override
     public void saveFlight(FlightDTO flightDto) {
         Flight newFlight = new Flight();
@@ -40,6 +46,10 @@ public class FlightService implements IFlightService{
         flightRepository.save(newFlight);
     }
 
+    /***
+     * Borra un vuelo que coincida con la id proporcionada
+     * @param id
+     */
     @Override
     public void deleteFlight(Long id) {
 
@@ -49,12 +59,22 @@ public class FlightService implements IFlightService{
 
     }
 
+    /***
+     * Devuelve un vuelo que coincida con la id proporcionada
+     * @param id
+     * @return
+     */
     @Override
     public Flight findFlight(Long id) {
         return flightRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Vuelo no encontrado"));
     }
 
+    /***
+     * Edita el vuelo con la informacion proporcionada
+     * @param flightDto
+     * @param id
+     */
     @Override
     public void editFlight(FlightDTO flightDto, Long id) {
 
@@ -85,6 +105,14 @@ public class FlightService implements IFlightService{
 
     }
 
+    /***
+     * Devuelve una lista de vuelos que coincidan con los parametros de busqueda
+     * @param origin
+     * @param destination
+     * @param startDate
+     * @param endDate
+     * @return
+     */
     @Override
     public List<Flight> findByOriginAndDestinationAndDateBetween(String origin, String destination, LocalDate startDate, LocalDate endDate) {
          return flightRepository.findByOriginAndDestinationAndDateBetween(origin, destination, startDate, endDate);

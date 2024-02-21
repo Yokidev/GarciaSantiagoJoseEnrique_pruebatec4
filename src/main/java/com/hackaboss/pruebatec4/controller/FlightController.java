@@ -21,6 +21,10 @@ public class FlightController {
     @Autowired
     private IFlightService flightService;
 
+    /***
+     * Devuelve la lista de vuelos
+     * @return
+     */
     @GetMapping("/flights")
     public ResponseEntity<List<Flight>> getFlights(){
         List<Flight> flightList = flightService.getFlights();
@@ -30,6 +34,11 @@ public class FlightController {
         return new ResponseEntity<>(flightList, HttpStatus.OK);
     }
 
+    /***
+     * Devuelve el vuelo que coincida con el id proporcionado
+     * @param id
+     * @return
+     */
     @GetMapping("/flights/{id}")
     public ResponseEntity<Flight> getFlightById(@PathVariable Long id){
         try {
@@ -40,7 +49,14 @@ public class FlightController {
         }
     }
 
-
+    /***
+     * Devuelve una lista de vuelos que coincida con los resultados obtenidos que coincidan con los parametros introducidos
+     * @param origin
+     * @param destination
+     * @param dateFrom
+     * @param dateTo
+     * @return
+     */
     @GetMapping("/flightsFiltered")
     public ResponseEntity<List<Flight>> getFlightsByOrigenAndDestinationAndDateBetween(
             @RequestParam String origin,
@@ -57,6 +73,11 @@ public class FlightController {
 
     }
 
+    /***
+     * Crea el vuelo con los datos proporcionados
+     * @param flightDTO
+     * @return
+     */
     @PostMapping("/flights/new")
     public ResponseEntity<String> createFlight(@RequestBody FlightDTO flightDTO){
 
@@ -65,6 +86,12 @@ public class FlightController {
 
     }
 
+    /***
+     * Modifica los parametros de un vuelo existente
+     * @param id
+     * @param flightDTO
+     * @return
+     */
     @PutMapping("/flights/edit/{id}")
     public ResponseEntity<String> editFlight(@PathVariable Long id, @RequestBody FlightDTO flightDTO){
 
@@ -77,6 +104,11 @@ public class FlightController {
 
     }
 
+    /***
+     * Borra el vuelo que coincida con la id proporcionada
+     * @param id
+     * @return
+     */
     @DeleteMapping("/flights/delete/{id}")
     public ResponseEntity<String> deleteFlight(@PathVariable Long id){
         try {

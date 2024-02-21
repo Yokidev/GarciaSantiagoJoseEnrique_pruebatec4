@@ -19,6 +19,10 @@ public class ClientController {
     @Autowired
     IClientService clientService;
 
+    /***
+     * Devuelve la lista de clientes de la BBDD
+     * @return ResponseEntity<List<Client>>
+     */
     @GetMapping("/clients")
     public ResponseEntity<List<Client>> getClients(){
         List<Client> clientList = clientService.getClients();

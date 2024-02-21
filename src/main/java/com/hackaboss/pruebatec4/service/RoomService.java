@@ -27,11 +27,19 @@ public class RoomService implements IRoomService{
     @Autowired
     private RoomBookingRepository roomBookingRepository;
 
+    /***
+     * Devuelve la lista de habitaciones de la BBDD
+     * @return
+     */
     @Override
     public List<Room> getRooms() {
         return roomRepository.findAll();
     }
 
+    /***
+     * Guarda una habitacion en la BBDD
+     * @param roomDto
+     */
     @Override
     public void saveRoom(RoomDTO roomDto) {
 
@@ -49,6 +57,10 @@ public class RoomService implements IRoomService{
 
     }
 
+    /***
+     * Borra una habitacion que coincida con la id proporcionada
+     * @param id
+     */
     @Override
     public void deleteRoom(Long id) {
         Room room = roomRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Habitacion no encontrada"));
@@ -57,18 +69,28 @@ public class RoomService implements IRoomService{
 
     }
 
+    /***
+     * Devuelve una habitacion que coincida con la id proporcionada
+     * @param id
+     * @return
+     */
     @Override
     public Room findRoom(Long id) {
         return roomRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Habitacion no encontrada"));
     }
 
+    /***
+     * Edita la habitacion con la informacion proporcionada
+     * @param roomDTO
+     * @param id
+     */
     @Override
     public void editRoom(RoomDTO roomDTO, Long id) {
 
         Room room = roomRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Habitacion no encontrada"));
 
         if (roomDTO.getRoomType()!= null)
-                room.setRoomType(roomDTO.getRoomType());
+            room.setRoomType(roomDTO.getRoomType());
 
         if (roomDTO.getMaxCapacity()!= null)
             room.setMaxCapacity(roomDTO.getMaxCapacity());
