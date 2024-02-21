@@ -58,14 +58,8 @@ public class FlightBookingService implements IFlightBookingService{
                     flightBooking.setNameClient(nameClient);
                     flightBooking.setNumberTickets(flightBookingDTO.getPassengers().size());
 
-
                     flightBookingRepository.save(flightBooking);
 
-                    //Actualizamos el numero de asientos
-                    int newFlightTotalBookedSeat = flight.getBookedSeat() + flightBookingDTO.getPassengers().size();
-                    flight.setBookedSeat(newFlightTotalBookedSeat);
-
-                    flightRepository.save(flight);
 
                     //Rellenamos la lista de clientes
                     for (ClientDTO clientDTO : flightBookingDTO.getPassengers()) {
@@ -99,6 +93,12 @@ public class FlightBookingService implements IFlightBookingService{
                         }
 
                     }
+
+                    //Actualizamos el numero de asientos
+                    int newFlightTotalBookedSeat = flight.getBookedSeat() + flightBookingDTO.getPassengers().size();
+                    flight.setBookedSeat(newFlightTotalBookedSeat);
+
+                    flightRepository.save(flight);
 
                 } else {
                     throw new FlightBookingDataException("El vuelo no admite tantos pasajeros");
