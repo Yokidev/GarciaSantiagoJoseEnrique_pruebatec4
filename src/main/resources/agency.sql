@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 22-02-2024 a las 00:42:06
+-- Tiempo de generación: 22-02-2024 a las 01:36:56
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -227,16 +227,15 @@ INSERT INTO `hotel_seq` (`next_val`) VALUES
 CREATE TABLE `login_user` (
   `id` bigint(20) NOT NULL,
   `password` varchar(255) DEFAULT NULL,
-  `user_name` varchar(255) DEFAULT NULL,
-  `user` varchar(255) DEFAULT NULL
+  `user_name` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 --
 -- Volcado de datos para la tabla `login_user`
 --
 
-INSERT INTO `login_user` (`id`, `password`, `user_name`, `user`) VALUES
-(1, '{bcrypt}$2a$04$J.OgvVpXZCkr0UunWPlaQ.Pu2Eei2yV0PKc8oxTXRcZ0YpNARipi2', 'usuario', NULL);
+INSERT INTO `login_user` (`id`, `password`, `user_name`) VALUES
+(1, '{bcrypt}$2a$04$J.OgvVpXZCkr0UunWPlaQ.Pu2Eei2yV0PKc8oxTXRcZ0YpNARipi2', 'usuario');
 
 -- --------------------------------------------------------
 
