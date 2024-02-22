@@ -43,6 +43,11 @@ Contraseña: 123
 <p>El proyecto se compone de distintos controllers que ofrecen endpoints con distintas funcionalidades segun a cual se llame.</p>
 <p>Algunas de ellas estan abiertas a uso publico para las demas funcionalidades hay que autenticarse.</p>
 
+```
+Usuario: usuario
+Contraseña: 123
+```
+
 <p>Las siguientes rutas se encuentran abiertas a uso publico:</p>
 
 `/agency/hotels` <br>
