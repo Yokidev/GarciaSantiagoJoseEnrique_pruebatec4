@@ -15,12 +15,12 @@ Un contenedor de servlet como Apache Tomcat para desplegar el proyecto web
 ```
 _Supuestos:_ <br>
 
-La tabla de datos de hoteles se ha dividido en Hoteles y habitaciones. 
-Las reservas de estas se hacen a traves de las habitaciones. 
-La disponibilidad de las mismas se rigen por las fechas en las que tengan o no una reserva.
-Es posible crear varios vuelos con las mismas caracteristicas pero se diferenciaran siempre por el codigo del mismo.
-Los clientes tienen una identificacion unica.
-Los administradores de la aplicacion tienen constancia tanto de la contraseña de la BBDD como de la contraseña para acceder a los endpoints protegidos
+La tabla de datos de hoteles se ha dividido en Hoteles y habitaciones. <br>
+Las reservas de estas se hacen a traves de las habitaciones. <br>
+La disponibilidad de las mismas se rigen por las fechas en las que tengan o no una reserva.<br>
+Es posible crear varios vuelos con las mismas caracteristicas pero se diferenciaran siempre por el codigo del mismo.<br>
+Los clientes tienen una identificacion unica.<br>
+Los administradores de la aplicacion tienen constancia tanto de la contraseña de la BBDD como de la contraseña para acceder a los endpoints protegidos<br>
 
 Contraseña de la BBDD
 ```
