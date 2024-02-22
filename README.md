@@ -14,6 +14,9 @@ Un gestor de bases de datos compatible con MySQL
 Un contenedor de servlet como Apache Tomcat para desplegar el proyecto web
 ```
 _Supuestos:_ <br>
+
+La tabla de datos de hoteles se ha dividido en Hoteles y habitaciones. Las reservas de estas se hacen a traves de las habitaciones. La disponibilidad de las mismas se rigen por las fechas en las que tengan o no una reserva.
+Es posible crear varios vuelos con las mismas caracteristicas pero se diferenciaran siempre por el codigo del mismo.
 Los clientes tienen una identificacion unica.
 Los administradores de la aplicacion tienen constancia tanto de la contraseña de la BBDD como de la contraseña para acceder a los endpoints protegidos
 
@@ -48,17 +51,6 @@ Usuario: usuario
 Contraseña: 123
 ```
 
-<p>Las siguientes rutas se encuentran abiertas a uso publico:</p>
-
-`/agency/hotels` <br>
-`/agency/hotels/{id}` <br>
-`/agency/hotelsFiltered` <br>
-`/agency/room-booking/new` <br>
-`/agency/flight-booking/new` <br>
-`/agency/flights` <br>
-`/agency/flights/{id}` <br>
-`/agency/flightsFiltered` <br>
-
 
 ### Client Controller
 ![client-controller](https://github.com/Yokidev/GarciaSantiagoJoseEnrique_pruebatec4/assets/113154741/721ccb6c-a3d4-4844-97e3-f7d35c41f13c)
@@ -78,6 +70,17 @@ Contraseña: 123
 ### Room Controller
 ![room-controller](https://github.com/Yokidev/GarciaSantiagoJoseEnrique_pruebatec4/assets/113154741/b86523fa-024f-4baa-a441-8cf0c61acdcb)
 
+
+<p>De las distintas rutas presentadas anteriormente las siguientes se encuentran abiertas a uso publico:</p>
+
+`/agency/hotels` <br>
+`/agency/hotels/{id}` <br>
+`/agency/hotelsFiltered` <br>
+`/agency/room-booking/new` <br>
+`/agency/flight-booking/new` <br>
+`/agency/flights` <br>
+`/agency/flights/{id}` <br>
+`/agency/flightsFiltered` <br>
 
 
 ## Construido con 🛠️
